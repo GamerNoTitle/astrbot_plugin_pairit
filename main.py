@@ -1,4 +1,5 @@
 import astrbot.api.message_components as components
+from astrbot.core import AstrBotConfig
 from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
@@ -22,6 +23,10 @@ PAIR_LIST = {
     "》": "《",
     "『": "』",
     "』": "『",
+    "［": "］",
+    "］": "［",
+    "｛": "｝",
+    "｝": "｛",
 }
 
 
