@@ -87,4 +87,3 @@ class PairItPlugin(Star):
             logger.info(f"[PairIt] [*] Successfully paired brackets.")
         else:
             logger.info("[PairIt] [*] Brackets are already paired.")
-            event.stop_event()
