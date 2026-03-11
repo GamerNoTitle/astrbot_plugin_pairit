@@ -17,7 +17,7 @@ $ git clone https://github.com/GamerNoTitle/astrbot_plugin_pairit.git
 现在好多群友喜欢在自己的消息后面带一个 `(`，而在我所在的 Osu Telegram 群里，有一个叫做 [Allen](https://t.me/jizizr_bot) 的 bot 能够匹配群友发的括号
 
 <div align="center">
-<img src="https://img.bili33.top/file/1773214693808_image.png">
+<img src="https://img.bili33.top/file/1773214920753_image.png">
 </div>
 
 于是我就给 Astrbot 也做了一个这样的插件，实现了同样的功能
