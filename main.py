@@ -1,6 +1,4 @@
-import astrbot.api.message_components as components
-from astrbot.core import AstrBotConfig
-from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
+from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 
@@ -62,18 +60,28 @@ class Stack:
 class PairItPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
+        config = context.get_config()
+        self.whitelist = config.get("platform_settings", {}).get("id_whitelist", [])
 
     async def initialize(self):
-        logger.info("[PairIt] [+] PairIt has been initialized.")
+        logger.info(
+            f"[PairIt] [+] PairIt has been initialized. Whitelist: {self.whitelist}"
+        )
 
     async def terminate(self):
         logger.info("[PairIt] [-] PairIt has been terminated.")
 
-    @filter.event_message_type(filter.EventMessageType.ALL)
-    async def on_message(self, event: AstrMessageEvent):
+    @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE)
+    async def on_group_message(self, event: AstrMessageEvent):
         """从监听的消息中获取发送的内容，并自动匹配括号"""
         stack = Stack()
         content = event.message_obj.message_str
+        group_id = event.message_obj.group_id
+        if group_id not in self.whitelist:
+            logger.info(
+                f"[PairIt] [*] Received message from group {group_id}, which is not in the whitelist. Ignoring."
+            )
+            return
         logger.debug(f"[PairIt] [*] Received message: {content}")
         for char in content:
             if char in PAIR_LIST:
@@ -91,4 +99,6 @@ class PairItPlugin(Star):
             yield event.plain_result(missing_brackets)
             logger.info(f"[PairIt] [*] Successfully paired brackets.")
         else:
-            logger.info("[PairIt] [*] Brackets are already paired.")
+            logger.info(
+                "[PairIt] [*] Brackets are already paired or no brackets found."
+            )
