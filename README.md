@@ -4,6 +4,18 @@
 
 ## 快速使用
 
+> [!important]
+>
+> 现已加入 Astrbot 插件库
+
+### 插件商店安装
+
+直接在插件商店找到本插件，安装即可
+
+![](https://img.bili33.top/file/1773226471162_image.png)
+
+### 从仓库安装
+
 直接在 Astrbot 的 plugin 文件夹下 Git clone
 
 ```bash
