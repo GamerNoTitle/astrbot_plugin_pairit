@@ -1,24 +1,92 @@
+import astrbot.api.message_components as components
 from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 
-@register("helloworld", "YourName", "一个简单的 Hello World 插件", "1.0.0")
-class MyPlugin(Star):
+PAIR_LIST = {
+    "(": ")",
+    ")": "(",
+    "[": "]",
+    "]": "[",
+    "{": "}",
+    "}": "{",
+    "<": ">",
+    ">": "<",
+    "「": "」",
+    "」": "「",
+    "（": "）",
+    "）": "（",
+    "【": "】",
+    "】": "【",
+    "《": "》",
+    "》": "《",
+    "『": "』",
+    "』": "『",
+}
+
+
+class Stack:
+    """
+    栈，用于压括号
+    """
+
+    def __init__(self):
+        self.data = []
+
+    def push(self, item: str):
+        self.data.append(item)
+
+    def pop(self) -> str:
+        if self.is_empty():
+            raise IndexError("Nothing in stack.")
+        return self.data.pop()
+
+    def is_empty(self) -> bool:
+        return len(self.data) == 0
+
+    def clear(self):
+        self.data.clear()
+
+
+@register(
+    "pairit",
+    "GamerNoTitle",
+    "自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了",
+    "1.0.0",
+)
+class PairIt(Star):
     def __init__(self, context: Context):
         super().__init__(context)
 
     async def initialize(self):
-        """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
-
-    # 注册指令的装饰器。指令名为 helloworld。注册成功后，发送 `/helloworld` 就会触发这个指令，并回复 `你好, {user_name}!`
-    @filter.command("helloworld")
-    async def helloworld(self, event: AstrMessageEvent):
-        """这是一个 hello world 指令""" # 这是 handler 的描述，将会被解析方便用户了解插件内容。建议填写。
-        user_name = event.get_sender_name()
-        message_str = event.message_str # 用户发的纯文本消息字符串
-        message_chain = event.get_messages() # 用户所发的消息的消息链 # from astrbot.api.message_components import *
-        logger.info(message_chain)
-        yield event.plain_result(f"Hello, {user_name}, 你发了 {message_str}!") # 发送一条纯文本消息
+        logger.info("[+] PairIt has been initialized.")
 
     async def terminate(self):
-        """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
+        logger.info("[-] PairIt has been terminated.")
+
+    @filter.event_message_type(filter.EventMessageType.ALL)
+    async def on_message(self, event: AstrMessageEvent):
+        """从监听的消息中获取发送的内容，并自动匹配括号"""
+        stack = Stack()
+        content = event.message_obj.message_str
+        msg_id = event.message_obj.message_id
+        logger.debug(f"[*] Received message: {content}")
+        for char in content:
+            if char in PAIR_LIST:
+                if stack.is_empty() or stack.data[-1] != PAIR_LIST[char]:
+                    stack.push(char)
+                else:
+                    stack.pop()
+
+        if not stack.is_empty():
+            reply_chain = []
+            missing_brackets = "".join(
+                [PAIR_LIST[char] for char in reversed(stack.data)]
+            )
+            logger.debug(f"[*] Missing brackets: {missing_brackets}")
+            reply_chain.append(components.Reply(id=msg_id, chain=[content]))
+            reply_chain.append(components.Plain(missing_brackets))
+            await event.send(event.chain_result(reply_chain))
+        else:
+            logger.debug("[*] Brackets are already paired.")
+            event.stop_event()
