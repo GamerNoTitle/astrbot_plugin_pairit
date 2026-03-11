@@ -1,14 +1,23 @@
-# astrbot-plugin-helloworld
+# PairIt
 
-AstrBot 插件模板 / A template plugin for AstrBot plugin feature
+自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了
 
-> [!NOTE]
-> This repo is just a template of [AstrBot](https://github.com/AstrBotDevs/AstrBot) Plugin.
-> 
-> [AstrBot](https://github.com/AstrBotDevs/AstrBot) is an agentic assistant for both personal and group conversations. It can be deployed across dozens of mainstream instant messaging platforms, including QQ, Telegram, Feishu, DingTalk, Slack, LINE, Discord, Matrix, etc. In addition, it provides a reliable and extensible conversational AI infrastructure for individuals, developers, and teams. Whether you need a personal AI companion, an intelligent customer support agent, an automation assistant, or an enterprise knowledge base, AstrBot enables you to quickly build AI applications directly within your existing messaging workflows.
+## 快速使用
 
-# Supports
+直接在 Astrbot 的 plugin 文件夹下 Git clone
 
-- [AstrBot Repo](https://github.com/AstrBotDevs/AstrBot)
-- [AstrBot Plugin Development Docs (Chinese)](https://docs.astrbot.app/dev/star/plugin-new.html)
-- [AstrBot Plugin Development Docs (English)](https://docs.astrbot.app/en/dev/star/plugin-new.html)
+```bash
+$ git clone https://github.com/GamerNoTitle/astrbot_plugin_pairit.git
+```
+
+然后去重启 astrbot / 重载插件即可
+
+## Why I made this?
+
+现在好多群友喜欢在自己的消息后面带一个 `(`，而在我所在的 Osu Telegram 群里，有一个叫做 [Allen](https://t.me/jizizr_bot) 的 bot 能够匹配群友发的括号
+
+<div align="center">
+<img src="https://img.bili33.top/file/1773214693808_image.png">
+</div>
+
+于是我就给 Astrbot 也做了一个这样的插件，实现了同样的功能

@@ -49,12 +49,12 @@ class Stack:
 
 
 @register(
-    "pairit",
+    "PairIt",
     "GamerNoTitle",
     "自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了",
     "1.0.0",
 )
-class PairIt(Star):
+class PairItPlugin(Star):
     def __init__(self, context: Context):
         super().__init__(context)
 
