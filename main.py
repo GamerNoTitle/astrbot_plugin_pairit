@@ -59,18 +59,17 @@ class PairIt(Star):
         super().__init__(context)
 
     async def initialize(self):
-        logger.info("[+] PairIt has been initialized.")
+        logger.info("[PairIt] [+] PairIt has been initialized.")
 
     async def terminate(self):
-        logger.info("[-] PairIt has been terminated.")
+        logger.info("[PairIt] [-] PairIt has been terminated.")
 
     @filter.event_message_type(filter.EventMessageType.ALL)
     async def on_message(self, event: AstrMessageEvent):
         """从监听的消息中获取发送的内容，并自动匹配括号"""
         stack = Stack()
         content = event.message_obj.message_str
-        msg_id = event.message_obj.message_id
-        logger.debug(f"[*] Received message: {content}")
+        logger.debug(f"[PairIt] [*] Received message: {content}")
         for char in content:
             if char in PAIR_LIST:
                 if stack.is_empty() or stack.data[-1] != PAIR_LIST[char]:
@@ -79,14 +78,13 @@ class PairIt(Star):
                     stack.pop()
 
         if not stack.is_empty():
-            reply_chain = []
             missing_brackets = "".join(
                 [PAIR_LIST[char] for char in reversed(stack.data)]
             )
-            logger.debug(f"[*] Missing brackets: {missing_brackets}")
-            reply_chain.append(components.Reply(id=msg_id, chain=[content]))
-            reply_chain.append(components.Plain(missing_brackets))
-            await event.send(event.chain_result(reply_chain))
+            logger.debug(f"[PairIt] [*] Missing brackets: {missing_brackets}")
+            logger.debug(f"[PairIt] [*] Sending plain reply: {missing_brackets}...")
+            yield event.plain_result(missing_brackets)
+            logger.info(f"[PairIt] [*] Successfully paired brackets.")
         else:
-            logger.debug("[*] Brackets are already paired.")
+            logger.info("[PairIt] [*] Brackets are already paired.")
             event.stop_event()
