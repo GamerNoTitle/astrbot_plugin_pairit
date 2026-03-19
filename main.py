@@ -130,9 +130,9 @@ class PairItPlugin(Star):
                 f"[PairIt] [*] Received message from group {group_id}, which is in the blacklist. Ignoring."
             )
             return
-        if event.message_obj.sender in self.config.blacklist_users:
+        if event.message_obj.sender.user_id in self.config.blacklist_users:
             logger.info(
-                f"[PairIt] [*] Received message from user {event.message_obj.sender}, who is in the blacklist. Ignoring."
+                f"[PairIt] [*] Received message from user {event.message_obj.sender.user_id}, who is in the blacklist. Ignoring."
             )
             return
         logger.debug(f"[PairIt] [*] Received message: {content}")
