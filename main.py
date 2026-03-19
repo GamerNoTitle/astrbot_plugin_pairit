@@ -195,7 +195,7 @@ class PairItPlugin(Star):
     async def disable_command(self, event: AstrMessageEvent, whom: str = "me"):
         if whom == "me":
             # 禁用自己
-            user_id = event.message_obj.sender
+            user_id = event.message_obj.sender.user_id
             if user_id not in self.config.blacklist_users:
                 self.config.blacklist_users.append(user_id)
                 self.save_config()
