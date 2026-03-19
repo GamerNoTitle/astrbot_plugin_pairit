@@ -24,6 +24,22 @@ $ git clone https://github.com/GamerNoTitle/astrbot_plugin_pairit.git
 
 然后去重启 astrbot / 重载插件即可
 
+### 命令列表
+
+```
+/pairit
+    |
+    |- about 显示帮助信息
+    |- enable/disable
+    |       |- me 为自己启用/禁用 Pairit 插件（默认）
+    |       |- group 为群组启用/禁用 Pairit 插件
+    |- status 显示 PairIt 插件在本群和自己身上的启用状态
+```
+
+例如，使用 `/pairit disable` 将会为自己禁用 Pairit 插件，因为 `me` 为缺省项
+
+而使用 `/pairit disable group` 将会为整个群组禁用 Pairit 插件，`enable` 同理
+
 ## Why I made this?
 
 现在好多群友喜欢在自己的消息后面带一个 `(`，而在我所在的 Osu Telegram 群里，有一个叫做 [Allen](https://t.me/jizizr_bot) 的 bot 能够匹配群友发的括号
