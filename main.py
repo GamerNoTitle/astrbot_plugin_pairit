@@ -36,8 +36,8 @@ PAIR_LIST = {
     "⟩": "⟨",
 }
 
-ABOUT_MSG = """[PairIt Plugin]
-自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了
+ABOUT_MSG = """🌟 Pairit
+自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了 {[><]}
 
 - /pairit about: 显示此帮助信息
 - /pairit <enable/disable> <me/group>: 在 自己(默认)/本群 启用/禁用 PairIt 插件
@@ -85,7 +85,7 @@ class Stack:
     "PairIt",
     "GamerNoTitle",
     "自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了",
-    "1.2.0",
+    "1.2.1",
 )
 class PairItPlugin(Star):
     def __init__(self, context: Context):
@@ -221,7 +221,7 @@ class PairItPlugin(Star):
     @pairit.command("status")
     async def status_command(self, event: AstrMessageEvent):
         group_id = event.message_obj.group_id
-        user_id = event.message_obj.sender
+        user_id = event.message_obj.sender.user_id
         group_status = (
             "启用" if group_id not in self.config.blacklist_groups else "禁用"
         )
