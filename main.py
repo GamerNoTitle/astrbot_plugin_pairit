@@ -1,6 +1,8 @@
 import os
 import json
+from typing import Any
 from pydantic import BaseModel, Field
+from functools import wraps
 
 from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
@@ -85,13 +87,34 @@ class Stack:
     "PairIt",
     "GamerNoTitle",
     "自动匹配群友发送的括号，这下括号再也不会出现不成对的情况了",
-    "1.2.1",
+    "1.3.0",
 )
 class PairItPlugin(Star):
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, config: dict):
+        """
+        初始化插件
+
+        :param context: 由 AstrBot 提供的上下文对象
+        :param config: 通过 _conf_schema.json 定义的配置
+        """
         super().__init__(context)
-        config = context.get_config()
-        self.whitelist = config.get("platform_settings", {}).get("id_whitelist", [])
+        astr_config = context.get_config()
+        if config.get(
+            "extend_astrbot_whitelist", True
+        ):  # 如果配置了继承 AstrBot 的白名单设置，则从 AstrBot 的配置中获取白名单设置
+            self.whitelist: list[Any] = astr_config.get("platform_settings", {}).get(
+                "id_whitelist", []
+            )
+            self.whitelist_enabled: bool = astr_config.get("platform_settings", {}).get(
+                "enable_id_white_list", True
+            )
+            logger.info("[PairIt] [*] Inherit whitelist settings from AstrBot config.")
+        else:  # 从插件自己的配置中获取信息
+            self.whitelist: list[Any] = config.get("whitelist", [])
+            self.whitelist_enabled: bool = config.get("whitelist_enabled", True)
+            logger.info(
+                "[PairIt] [*] Extend settings is set to False. Using whitelist settings from PairIt plugin config."
+            )
         self.config_dir = get_astrbot_data_path() + "/plugin_data/astrbot_plugin_pairit"
         self.config_path = os.path.join(self.config_dir, "config.json")
         if os.path.exists(self.config_path):
@@ -108,7 +131,7 @@ class PairItPlugin(Star):
 
     async def initialize(self):
         logger.info(
-            f"[PairIt] [+] PairIt has been initialized. Whitelist: {self.whitelist}"
+            f"[PairIt] [+] PairIt has been initialized. {'Whitelist is not enabled, processing messages without whitelist check.' if not self.whitelist_enabled else f'Whitelist is enabled, only processing messages from groups {self.whitelist}.'}"
         )
 
     async def terminate(self):
@@ -120,21 +143,26 @@ class PairItPlugin(Star):
         stack = Stack()
         content = event.message_obj.message_str
         group_id = event.message_obj.group_id
-        if group_id not in self.whitelist:
-            logger.info(
-                f"[PairIt] [*] Received message from group {group_id}, which is not in the whitelist. Ignoring."
+        if self.whitelist_enabled:
+            if group_id not in self.whitelist:
+                logger.info(
+                    f"[PairIt] [*] Received message from group {group_id}, which is not in the whitelist. Ignoring."
+                )
+                return
+            if group_id in self.config.blacklist_groups:
+                logger.info(
+                    f"[PairIt] [*] Received message from group {group_id}, which is in the blacklist. Ignoring."
+                )
+                return
+            if event.message_obj.sender.user_id in self.config.blacklist_users:
+                logger.info(
+                    f"[PairIt] [*] Received message from user {event.message_obj.sender.user_id}, who is in the blacklist. Ignoring."
+                )
+                return
+        else:
+            logger.debug(
+                "[PairIt] [*] Whitelist is disabled, processing message without whitelist check."
             )
-            return
-        if group_id in self.config.blacklist_groups:
-            logger.info(
-                f"[PairIt] [*] Received message from group {group_id}, which is in the blacklist. Ignoring."
-            )
-            return
-        if event.message_obj.sender.user_id in self.config.blacklist_users:
-            logger.info(
-                f"[PairIt] [*] Received message from user {event.message_obj.sender.user_id}, who is in the blacklist. Ignoring."
-            )
-            return
         logger.debug(f"[PairIt] [*] Received message: {content}")
         for char in content:
             if char in PAIR_LIST:
@@ -166,6 +194,11 @@ class PairItPlugin(Star):
 
     @pairit.command("enable")
     async def enable_command(self, event: AstrMessageEvent, whom: str = "me"):
+        if self.whitelist_enabled and event.message_obj.group_id not in self.whitelist:
+            logger.info(
+                f"[PairIt] [*] Received command from group {event.message_obj.group_id}, which is not in the whitelist. Ignoring."
+            )
+            return
         if whom == "me":
             # 启用自己
             user_id = event.message_obj.sender.user_id
@@ -193,6 +226,11 @@ class PairItPlugin(Star):
 
     @pairit.command("disable")
     async def disable_command(self, event: AstrMessageEvent, whom: str = "me"):
+        if self.whitelist_enabled and event.message_obj.group_id not in self.whitelist:
+            logger.info(
+                f"[PairIt] [*] Received command from group {event.message_obj.group_id}, which is not in the whitelist. Ignoring."
+            )
+            return
         if whom == "me":
             # 禁用自己
             user_id = event.message_obj.sender.user_id
@@ -220,6 +258,11 @@ class PairItPlugin(Star):
 
     @pairit.command("status")
     async def status_command(self, event: AstrMessageEvent):
+        if self.whitelist_enabled and event.message_obj.group_id not in self.whitelist:
+            logger.info(
+                f"[PairIt] [*] Received command from group {event.message_obj.group_id}, which is not in the whitelist. Ignoring."
+            )
+            return
         group_id = event.message_obj.group_id
         user_id = event.message_obj.sender.user_id
         group_status = (

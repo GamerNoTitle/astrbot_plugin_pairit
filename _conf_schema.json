@@ -1,0 +1,20 @@
+{
+    "extend_astrbot_whitelist": {
+        "description": "沿用主体白名单配置",
+        "hint": "决定是否沿用 Astrbot 配置中的白名单，包括启用状态和白名单列表的内容。⚠️更改了 Astrbot 主体的白名单配置后请务必重载本插件以读取最新配置",
+        "type": "bool",
+        "default": true
+    },
+    "whitelist_enabled": {
+        "description": "启用白名单",
+        "hint": "在不沿用主体白名单的情况下，此项设置为启用将会匹配白名单中的群聊/私聊来决定是否进行括号匹配",
+        "type": "bool",
+        "default": true
+    },
+    "whitelist": {
+        "description": "白名单",
+        "hint": "在不沿用主体白名单的情况下，此项设置中的列表为插件所使用的白名单，包含群聊 ID 和私聊 ID，启用后仅匹配列表中的群聊/私聊进行括号匹配",
+        "type": "list",
+        "default": []
+    }
+}
