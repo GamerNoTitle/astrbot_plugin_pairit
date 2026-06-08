@@ -49,3 +49,11 @@ $ git clone https://github.com/GamerNoTitle/astrbot_plugin_pairit.git
 </div>
 
 于是我就给 Astrbot 也做了一个这样的插件，实现了同样的功能
+
+### 快速排错
+
+#### 没反应啊？日志也没有任何 `[PairIt]` 开头的输出
+
+检查是否安装了 **唤醒增强** 插件（对应 repo: https://github.com/Zhalslar/astrbot_plugin_wakepro )
+
+该插件的插件配置中有「屏蔽复读」选项，如果开启了会切断消息时间的传播，导致 PairIt 无法接收到消息事件，进而无法做出对应的回应 [#4](https://github.com/GamerNoTitle/astrbot_plugin_pairit/issues/4)

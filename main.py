@@ -178,7 +178,7 @@ class PairItPlugin(Star):
             logger.debug(f"[PairIt] [*] Missing brackets: {missing_brackets}")
             logger.debug(f"[PairIt] [*] Sending plain reply: {missing_brackets}...")
             yield event.plain_result(missing_brackets)
-            logger.info(f"[PairIt] [*] Successfully paired brackets.")
+            logger.info("[PairIt] [*] Successfully paired brackets.")
         else:
             logger.info(
                 "[PairIt] [*] Brackets are already paired or no brackets found."
